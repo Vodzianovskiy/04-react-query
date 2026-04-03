@@ -9,7 +9,7 @@ interface FetchMoviesResponse {
   total_pages: number;
 }
 
-const fetchMovies = async (
+export const fetchMovies = async (
   query: string,
   page: number,
 ): Promise<FetchMoviesResponse> => {
