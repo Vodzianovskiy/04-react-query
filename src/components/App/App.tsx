@@ -1,4 +1,3 @@
-import Pagination from "../Pagination/Pagination";
 import { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { useMovies } from "../../services/movieService";
@@ -8,22 +7,26 @@ import MovieGrid from "../MovieGrid/MovieGrid";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
+import Pagination from "../Pagination/Pagination";
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, isError } = useMovies(query, page);
+  const { data, isLoading, isFetching, isError, isSuccess } = useMovies(
+    query,
+    page,
+  );
 
   const movies = data?.results ?? [];
   const totalPages = data?.total_pages ?? 0;
 
   useEffect(() => {
-    if (!isLoading && !isError && query && movies.length === 0) {
+    if (isSuccess && query && movies.length === 0) {
       toast.error("No movies found for your request.");
     }
-  }, [movies, isLoading, isError, query]);
+  }, [isSuccess, movies, query]);
 
   const handleSearch = (newQuery: string) => {
     setQuery(newQuery);
@@ -39,9 +42,9 @@ export default function App() {
     <>
       <Toaster />
       <SearchBar onSubmit={handleSearch} />
-      {isLoading && <Loader />}
+      {(isLoading || isFetching) && <Loader />}
       {isError && <ErrorMessage />}
-      {!isLoading && !isError && movies.length > 0 && (
+      {isSuccess && movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={setSelectedMovie} />
       )}
       {totalPages > 1 && (

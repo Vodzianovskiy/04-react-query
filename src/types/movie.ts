@@ -7,5 +7,3 @@ export interface Movie {
   release_date: string;
   vote_average: number;
 }
-
-export const url = "https://api.themoviedb.org/3/search/movie";

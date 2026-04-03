@@ -1,7 +1,8 @@
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import type { Movie } from "../types/movie";
-import { url } from "../types/movie";
+
+const BASE_URL = "https://api.themoviedb.org/3/search/movie";
 
 interface FetchMoviesResponse {
   results: Movie[];
@@ -12,7 +13,7 @@ const fetchMovies = async (
   query: string,
   page: number,
 ): Promise<FetchMoviesResponse> => {
-  const response = await axios.get(url, {
+  const response = await axios.get<FetchMoviesResponse>(BASE_URL, {
     params: { query, page },
     headers: {
       Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
@@ -26,5 +27,6 @@ export function useMovies(query: string, page: number) {
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: !!query,
+    placeholderData: keepPreviousData,
   });
 }
